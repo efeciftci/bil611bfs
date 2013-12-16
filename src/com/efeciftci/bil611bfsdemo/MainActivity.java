@@ -3,14 +3,12 @@ package com.efeciftci.bil611bfsdemo;
 import java.util.LinkedList;
 import java.util.Queue;
 import android.os.Bundle;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.KeyEvent;
@@ -66,8 +64,11 @@ public class MainActivity extends Activity {
 		flag_addRoot = false;
 		flag_addVertex = false;
 
+		/*
+		 * bind enter key to run setVertexValue method while setting value of a
+		 * vertex
+		 */
 		et_value.setOnKeyListener(new View.OnKeyListener() {
-
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if ((event.getAction() == KeyEvent.ACTION_DOWN)
@@ -78,8 +79,8 @@ public class MainActivity extends Activity {
 			}
 		});
 
+		/* bind enter key to run doBFS method after entering search key */
 		et_key.setOnKeyListener(new View.OnKeyListener() {
-
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if ((event.getAction() == KeyEvent.ACTION_DOWN)
@@ -100,15 +101,27 @@ public class MainActivity extends Activity {
 	}
 
 	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_exit:
+			System.exit(0);
+			break;
+		default:
+			break;
+		}
+		return true;
+	}
+
+	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		/* TODO addRoot and addVertex repeat the same code, merge them */
 		if (flag_addRoot) {
+			/* runs when adding a root vertex for the first time */
 			flag_addRoot = false;
 			Point p = new Point((int) event.getX(), (int) event.getY());
-			Log.v("mylog", "(" + p.x + "," + p.y + ")");
 
 			root = new Vertex(0, getApplicationContext(), p);
 			root.tv.setOnClickListener(new View.OnClickListener() {
-
 				@Override
 				public void onClick(View v) {
 					if (selected != null)
@@ -126,12 +139,12 @@ public class MainActivity extends Activity {
 			});
 			rl.addView(root.tv);
 		} else if (flag_addVertex) {
+			/* runs when adding new child vertices */
 			flag_addVertex = false;
 			Point p = new Point((int) event.getX(), (int) event.getY());
 			Vertex v = new Vertex(0, getApplicationContext(), p);
 			selected.addChild(v);
 			v.tv.setOnClickListener(new View.OnClickListener() {
-
 				@Override
 				public void onClick(View v) {
 					if (selected != null)
@@ -147,6 +160,7 @@ public class MainActivity extends Activity {
 			});
 			rl.addView(v.tv);
 		} else {
+			/* runs when touched on empty space */
 			if (selected != null) {
 				selected.unselect();
 				selected = null;
@@ -159,16 +173,23 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	/* adds starting vertex */
 	public void addRoot(View v) {
 		flag_addRoot = true;
 		btn_add_root.setEnabled(false);
 		Toast.makeText(this, R.string.toast_addroot, Toast.LENGTH_LONG).show();
 	}
 
+	/* adds child vertices for the chosen vertex */
 	public void addVertex(View v) {
 		flag_addVertex = true;
+		/* TODO create a new string and add toast here */
 	}
 
+	/*
+	 * compares available textView's in the layout and returns owning Vertex
+	 * object if a match has been found
+	 */
 	public Vertex findVertexByTextView(TextView tv) {
 		Queue<Vertex> q = new LinkedList<Vertex>();
 		q.add(this.root);
@@ -183,6 +204,9 @@ public class MainActivity extends Activity {
 		return null;
 	}
 
+	/*
+	 * reads value from EditText and sets value of selected vertex
+	 */
 	public void setVertexValue(View v) {
 		int value = 0;
 		try {
@@ -195,6 +219,7 @@ public class MainActivity extends Activity {
 		selected.setData(value);
 	}
 
+	/* breadth-first search is done here */
 	public void doBFS(View v) {
 		int key = 0;
 		int cnt = 0;
@@ -229,6 +254,7 @@ public class MainActivity extends Activity {
 		tv_queue.append("\nCould not find key=" + key + "!");
 	}
 
+	/* sets all vertices as unvisited */
 	public void resetTree() {
 		Queue<Vertex> q = new LinkedList<Vertex>();
 		q.add(this.root);
@@ -242,6 +268,9 @@ public class MainActivity extends Activity {
 		tv_queue.setText("");
 	}
 
+	/*
+	 * generates queue string for each BFS enqueue / dequeue operation
+	 */
 	public void generateQStr(Queue<Vertex> q) {
 		Vertex v;
 		String qStr = new String("");
@@ -253,12 +282,12 @@ public class MainActivity extends Activity {
 		tv_queue.append("\nQueue: " + qStr);
 	}
 
+	/* draws lines between each relating vertices */
 	private class DrawView extends View {
 		public DrawView(Context c) {
 			super(c);
 		}
 
-		@SuppressLint("DrawAllocation")
 		@Override
 		public void onDraw(Canvas canvas) {
 			if (root != null) {
@@ -281,18 +310,7 @@ public class MainActivity extends Activity {
 	}
 
 	public void removeVertex(View v) {
+		/* TODO implement this */
 		Toast.makeText(this, "To be implemented", Toast.LENGTH_LONG).show();
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.action_exit:
-			System.exit(0);
-			break;
-		default:
-			break;
-		}
-		return true;
 	}
 }
